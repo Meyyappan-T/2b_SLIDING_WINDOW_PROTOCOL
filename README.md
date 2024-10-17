@@ -8,6 +8,62 @@
 5. If your frames reach the server it will send ACK signal to client
 6. Stop the Program
 ## PROGRAM
+### Server-sliding
+```py
+import socket
+s = socket.socket()
+s.bind(('localhost', 9999))
+s.listen(1)
+print("Server listening...")
+conn, addr = s.accept()
+print(f"Connected to {addr}")
+
+while True:
+   frames = conn.recv(1024).decode()
+   if not frames:
+       break
+
+   print(f"Received frames: {frames}")
+   ack_message = f"ACK for frames: {frames}"
+   conn.send(ack_message.encode())
+
+conn.close()  
+s.close()  
+```
+### Client-sliding
+```py
+import socket
+c = socket.socket()
+c.connect(('localhost', 9999))
+size = int(input("Enter number of frames to send: "))
+l = list(range(size))  
+print("Total frames to send:", len(l))
+s = int(input("Enter Window Size: "))
+i = 0
+while True:
+   while i < len(l):
+       st = i + s
+       frames_to_send = l[i:st]  
+       print(f"Sending frames: {frames_to_send}")
+       c.send(str(frames_to_send).encode())  
+
+       ack = c.recv(1024).decode()  
+       if ack:
+           print(f"Acknowledgment received: {ack}")
+           i += s  
+   break
+c.close()  
+```
+
 ## OUPUT
+### Server
+![image](https://github.com/user-attachments/assets/8f59b895-115b-4dd6-abaa-dfe5f3100d31)
+
+
+### Client
+![image](https://github.com/user-attachments/assets/54e2ed5f-25eb-4013-b892-0ed5f3735672)
+
+
 ## RESULT
+
 Thus, python program to perform stop and wait protocol was successfully executed
